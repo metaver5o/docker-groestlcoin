@@ -1,7 +1,7 @@
 version: "3"
 services:
   bitcoind:
-    image: NicolasDorier/bitcoin
+    image: nicolasdorier/docker-bitcoin:0.18.0
     # specify additional command line arguments here
     command: bitcoind
     healthcheck:
@@ -14,7 +14,7 @@ services:
     networks:
       - bitcoin
   bitcoin-cli:
-    image: NicolasDorier/bitcoin
+    image: nicolasdorier/docker-bitcoin:0.18.0
     entrypoint: ["/entrypoint.sh", "bitcoin-cli"]
     command: ""
     depends_on:
