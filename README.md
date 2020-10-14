@@ -21,25 +21,25 @@ To see the available versions/tags, please visit the appropriate pages on Docker
 To start a groestlcoind instance running the latest version:
 
 ```
-$ docker run Groestlcoin/groestlcoin
+$ docker run Groestlcoin/docker-groestlcoin
 ```
 
 This docker image provides different tags so that you can specify the exact version of groestlcoin you wish to run. For example, to run the latest minor version in the `2.16.x` series (currently `2.16.3`):
 
 ```
-$ docker run Groestlcoin/groestlcoin:2.16
+$ docker run Groestlcoin/docker-groestlcoin:2.16
 ```
 
 Or, to run the `2.16.0` release specifically:
 
 ```
-$ docker run Groestlcoin/groestlcoin:2.16.0
+$ docker run Groestlcoin/docker-groestlcoin:2.16.0
 ```
 
 To run a Groestlcoin container in the background, pass the `-d` option to `docker run`, and give your container a name for easy reference later:
 
 ```
-$ docker run -d --rm --name groestlcoind Groestlcoin/groestlcoin
+$ docker run -d --rm --name groestlcoind Groestlcoin/docker-groestlcoin
 ```
 
 Once you have a Groestlcoin service running in the background, you can show running containers:
@@ -96,7 +96,7 @@ Specific versions of these alternate clients may be run using the command line o
 The best method to configure the Groestlcoin server is to pass arguments to the `groestlcoind` command. For example, to run groestlcoin on the testnet:
 
 ```
-$ docker run --name groestlcoind-testnet Groestlcoin/groestlcoin groestlcoind -testnet
+$ docker run --name groestlcoind-testnet Groestlcoin/docker-groestlcoin groestlcoind -testnet
 ```
 
 Alternatively, you can edit the `groestlcoin.conf` file which is generated in your data directory (see below).
@@ -108,7 +108,7 @@ By default, Docker will create ephemeral containers. That is, the blockchain dat
 To keep your blockchain data between container restarts or upgrades, simply add the `-v` option to create a [data volume](https://docs.docker.com/engine/tutorials/dockervolumes/):
 
 ```
-$ docker run -d --rm --name groestlcoind -v groestlcoin-data:/data Groestlcoin/groestlcoin
+$ docker run -d --rm --name groestlcoind -v groestlcoin-data:/data Groestlcoin/docker-groestlcoin
 $ docker ps
 $ docker inspect groestlcoin-data
 ```
@@ -116,7 +116,7 @@ $ docker inspect groestlcoin-data
 Alternatively, you can map the data volume to a location on your host:
 
 ```
-$ docker run -d --rm --name groestlcoind -v "$PWD/data:/data" Groestlcoin/groestlcoin
+$ docker run -d --rm --name groestlcoind -v "$PWD/data:/data" Groestlcoin/docker-groestlcoin
 $ ls -alh ./data
 ```
 
@@ -127,16 +127,16 @@ By default, Docker runs all containers on a private bridge network. This means t
 There are several methods to run `groestlcoin-cli` against a running `groestlcoind` container. The easiest is to simply let your `groestlcoin-cli` container share networking with your `groestlcoind` container:
 
 ```
-$ docker run -d --rm --name groestlcoind -v groestlcoin-data:/data Groestlcoin/groestlcoin
-$ docker run --rm --network container:groestlcoind Groestlcoin/groestlcoin groestlcoin-cli getinfo
+$ docker run -d --rm --name groestlcoind -v groestlcoin-data:/data Groestlcoin/docker-groestlcoin
+$ docker run --rm --network container:groestlcoind Groestlcoin/docker-groestlcoin groestlcoin-cli getinfo
 ```
 
 If you plan on exposing the RPC port to multiple containers (for example, if you are developing an application which communicates with the RPC port directly), you probably want to consider creating a [user-defined network](https://docs.docker.com/engine/userguide/networking/). You can then use this network for both your `groestlcoind` and `groestlcoin-cli` containers, passing `-rpcconnect` to specify the hostname of your `groestlcoind` container:
 
 ```
 $ docker network create groestlcoin
-$ docker run -d --rm --name groestlcoind -v groestlcoin-data:/data --network groestlcoin Groestlcoin/groestlcoin
-$ docker run --rm --network groestlcoin Groestlcoin/groestlcoin groestlcoin-cli -rpcconnect=groestlcoind getinfo
+$ docker run -d --rm --name groestlcoind -v groestlcoin-data:/data --network groestlcoin Groestlcoin/docker-groestlcoin
+$ docker run --rm --network groestlcoin Groestlcoin/docker-groestlcoin groestlcoin-cli -rpcconnect=groestlcoind getinfo
 ```
 
 ### Complete Example
