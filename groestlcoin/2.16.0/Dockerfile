@@ -9,7 +9,7 @@ RUN set -ex \
 
 ENV GROESTLCOIN_VERSION 2.16.0
 ENV GROESTLCOIN_URL https://github.com/Groestlcoin/groestlcoin/releases/download/v2.16.0/groestlcoin-2.16.0-x86_64-linux-gnu.tar.gz
-ENV GROESTLCOIN_SHA256 4e7683bbc6f3b7899761d1360f52a91f417e2b7e6c56b75b522d95b86ca46628
+ENV GROESTLCOIN_SHA256 9a57add934d8715090fe6a77867271884495cf53be6fc7ca986b3ddc626772f1
 
 # install groestlcoin binaries
 RUN set -ex \
