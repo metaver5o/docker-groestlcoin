@@ -18,9 +18,14 @@ if [[ "$1" == "bitcoin-cli" || "$1" == "bitcoin-tx" || "$1" == "bitcoind" || "$1
 	if [[ "$BITCOIN_WALLETDIR" ]] && [[ "$BITCOIN_NETWORK" ]]; then
 		NL=$'\n'
 		WALLETDIR="$BITCOIN_WALLETDIR/${BITCOIN_NETWORK}"
+		WALLETFILE="${WALLETDIR}/wallet.dat"
 		mkdir -p "$WALLETDIR"	
 		chown -R bitcoin:bitcoin "$WALLETDIR"
 		CONFIG_PREFIX="${CONFIG_PREFIX}${NL}walletdir=${WALLETDIR}${NL}"
+		if ! [[ -f "${WALLETFILE}" ]]; then
+		  echo "The wallet does not exists, creating it at ${WALLETDIR}..."
+		  gosu bitcoin bitcoin-wallet "-datadir=${WALLETDIR}" "-wallet=" create
+		fi
 	fi
 	
 	cat <<-EOF > "$BITCOIN_DATA/bitcoin.conf"
