@@ -8,22 +8,34 @@ RUN set -ex \
 	&& rm -rf /var/lib/apt/lists/*
 
 ENV BITCOIN_VERSION 0.18.0
-ENV BITCOIN_FILE bitcoin-0.18.0-x86_64-linux-gnu.tar.gz
-ENV BITCOIN_URL https://bitcoincore.org/bin/bitcoin-core-0.18.0/
+ENV BITCOIN_TARBALL bitcoin-$BITCOIN_VERSION-x86_64-linux-gnu.tar.gz
+ENV BITCOIN_URL https://bitcoincore.org/bin/bitcoin-core-$BITCOIN_VERSION/$BITCOIN_TARBALL
 ENV BITCOIN_SHA256 5146ac5310133fbb01439666131588006543ab5364435b748ddfc95a8cb8d63f
-ENV BITCOIN_ASC_URL https://bitcoincore.org/bin/bitcoin-core-0.18.0/SHA256SUMS.asc
+ENV BITCOIN_ASC_URL https://bitcoincore.org/bin/bitcoin-core-$BITCOIN_VERSION/SHA256SUMS.asc
+# Added for transparency where the signing key comes from:
+#  - 01EA5486DE18A882D4C2684590C8019E36C2E964 is Wladimir J. van der Laan's signing key
+#  - it was mentioned already 2015 on bitcoin-dev Mailinglist in a (signed) message from
+#    Wladimir J. van der Laan:
+#    https://lists.linuxfoundation.org/pipermail/bitcoin-dev/2015-June/009045.html
+#  - it is mentioned on the bitcoincore download page: https://bitcoincore.org/en/download/
 ENV BITCOIN_PGP_KEY 01EA5486DE18A882D4C2684590C8019E36C2E964
 
 # install bitcoin binaries
 RUN set -ex \
 	&& cd /tmp \
-	&& wget -qO "$BITCOIN_FILE" "$BITCOIN_URL$BITCOIN_FILE" \
-	&& echo "$BITCOIN_SHA256 $BITCOIN_FILE" | sha256sum -c - \
-	&& gpg --batch --keyserver keyserver.ubuntu.com --recv-keys "$BITCOIN_PGP_KEY" \
+	&& wget -qO "$BITCOIN_TARBALL" "$BITCOIN_URL" \
+	&& echo "$BITCOIN_SHA256 $BITCOIN_TARBALL" | sha256sum -c - \
+	&& for server in $(shuf -e ha.pool.sks-keyservers.net \
+                             hkp://p80.pool.sks-keyservers.net:80 \
+                             keyserver.ubuntu.com \
+                             hkp://keyserver.ubuntu.com:80 \
+                             pgp.mit.edu) ; do \
+         gpg --batch --keyserver "$server" --recv-keys "$BITCOIN_PGP_KEY" && break || : ; \
+     done \
 	&& wget -qO bitcoin.asc "$BITCOIN_ASC_URL" \
 	&& sha256sum --ignore-missing --check bitcoin.asc \
 	&& gpg --verify bitcoin.asc \
-	&& tar -xzvf "$BITCOIN_FILE" -C /usr/local --strip-components=1 --exclude=*-qt \
+	&& tar -xzvf "$BITCOIN_TARBALL" -C /usr/local --strip-components=1 --exclude=*-qt \
 	&& rm -rf /tmp/*
 
 # create data directory
