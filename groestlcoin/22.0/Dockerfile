@@ -7,17 +7,22 @@ RUN set -ex \
 	&& apt-get install -qq --no-install-recommends ca-certificates dirmngr gosu wget \
 	&& rm -rf /var/lib/apt/lists/*
 
-ENV GROESTLCOIN_VERSION 2.16.0
+ENV GROESTLCOIN_VERSION 22.0
 ENV GROESTLCOIN_TARBALL groestlcoin-${GROESTLCOIN_VERSION}-x86_64-linux-gnu.tar.gz
 ENV GROESTLCOIN_URL https://github.com/Groestlcoin/groestlcoin/releases/download/v$GROESTLCOIN_VERSION/$GROESTLCOIN_TARBALL
-ENV GROESTLCOIN_SHA256 9a57add934d8715090fe6a77867271884495cf53be6fc7ca986b3ddc626772f1
+ENV GROESTLCOIN_SHA256 b30c5353dd3d9cfd7e8b31f29eac125925751165f690bacff57effd76560dddd
+ENV GROESTLCOIN_ASC_URL https://github.com/Groestlcoin/groestlcoin/releases/download/v$GROESTLCOIN_VERSION/SHA256SUMS.asc
+ENV GROESTLCOIN_SHASUM_URL https://github.com/Groestlcoin/groestlcoin/releases/download/v$GROESTLCOIN_VERSION/SHA256SUMS
 
 # install groestlcoin binaries
 RUN set -ex \
 	&& cd /tmp \
 	&& wget -qO $GROESTLCOIN_TARBALL "$GROESTLCOIN_URL" \
 	&& echo "$GROESTLCOIN_SHA256 $GROESTLCOIN_TARBALL" | sha256sum -c - \
-	&& tar -xzvf $GROESTLCOIN_TARBALL -C /usr/local/bin --exclude=*-qt \
+	&& wget -qO SHA256SUMS.asc "$GROESTLCOIN_ASC_URL" \
+	&& wget -qO SHA256SUMS "$GROESTLCOIN_SHASUM_URL" \
+	&& sha256sum --ignore-missing --check SHA256SUMS \
+	&& tar -xzvf $GROESTLCOIN_TARBALL -C /usr/local/ --strip-components=1 --exclude=*-qt \
 	&& rm -rf /tmp/*
 
 # create data directory

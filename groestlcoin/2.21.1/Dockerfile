@@ -10,6 +10,7 @@ RUN set -ex \
 ENV GROESTLCOIN_VERSION 2.21.1
 ENV GROESTLCOIN_TARBALL groestlcoin-${GROESTLCOIN_VERSION}-x86_64-linux-gnu.tar.gz
 ENV GROESTLCOIN_URL https://github.com/Groestlcoin/groestlcoin/releases/download/v$GROESTLCOIN_VERSION/$GROESTLCOIN_TARBALL
+ENV GROESTLCOIN_SHA256 b03bd4211f9473b39a12f6e57e64fe7bc9f2f54f27491f46f5b1bff5b96db7a5
 ENV GROESTLCOIN_ASC_URL https://github.com/Groestlcoin/groestlcoin/releases/download/v$GROESTLCOIN_VERSION/SHA256SUMS.asc
 ENV GROESTLCOIN_PGP_KEY 287AE4CA1187C68C08B49CB2D11BD4F33F1DB499
 
@@ -17,6 +18,7 @@ ENV GROESTLCOIN_PGP_KEY 287AE4CA1187C68C08B49CB2D11BD4F33F1DB499
 RUN set -ex \
 	&& cd /tmp \
 	&& wget -qO $GROESTLCOIN_TARBALL "$GROESTLCOIN_URL" \
+	&& echo "$GROESTLCOIN_SHA256 $GROESTLCOIN_TARBALL" | sha256sum -c - \
 	&& for server in $(shuf -e ha.pool.sks-keyservers.net \
                              hkp://p80.pool.sks-keyservers.net:80 \
                              keyserver.ubuntu.com \
@@ -25,9 +27,8 @@ RUN set -ex \
          gpg --batch --keyserver "$server" --recv-keys "$GROESTLCOIN_PGP_KEY" && break || : ; \
      done \
 	&& wget -qO groestlcoin.asc "$GROESTLCOIN_ASC_URL" \
+	&& sha256sum --ignore-missing --check groestlcoin.asc \
 	&& gpg --verify groestlcoin.asc \
-	&& grep $GROESTLCOIN_TARBALL groestlcoin.asc | tee SHA256SUMS.asc \
-	&& sha256sum -c SHA256SUMS.asc \
 	&& tar -xzvf $GROESTLCOIN_TARBALL -C /usr/local/ --strip-components=1 --exclude=*-qt \
 	&& rm -rf /tmp/*
 
