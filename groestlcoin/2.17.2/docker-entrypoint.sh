@@ -4,7 +4,19 @@ set -e
 if [[ "$1" == "groestlcoin-cli" || "$1" == "groestlcoin-tx" || "$1" == "groestlcoind" || "$1" == "test_groestlcoin" ]]; then
 	mkdir -p "$GROESTLCOIN_DATA"
 
+	CONFIG_PREFIX=""
+	if [[ "${GROESTLCOIN_NETWORK}" == "regtest" ]]; then
+		CONFIG_PREFIX=$'regtest=1\n[regtest]'
+	fi
+	if [[ "${GROESTLCOIN_NETWORK}" == "testnet" ]]; then
+		CONFIG_PREFIX=$'testnet=1\n[test]'
+	fi
+	if [[ "${GROESTLCOIN_NETWORK}" == "mainnet" ]]; then
+		CONFIG_PREFIX=$'mainnet=1\n[main]'
+	fi
+
 	cat <<-EOF > "$GROESTLCOIN_DATA/groestlcoin.conf"
+	${CONFIG_PREFIX}
 	printtoconsole=1
 	rpcallowip=::/0
 	${GROESTLCOIN_EXTRA_ARGS}
