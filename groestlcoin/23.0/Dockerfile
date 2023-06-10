@@ -39,4 +39,3 @@ ENTRYPOINT ["/entrypoint.sh"]
 
 EXPOSE 1331 1441 17777 17766 18888 18443
 CMD ["groestlcoind"]
-docker run -d --rm --name groestlcoind groestlcoin-cli 
