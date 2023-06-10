@@ -2,9 +2,10 @@ FROM debian:stretch-slim
 
 RUN groupadd -r groestlcoin && useradd -r -m -g groestlcoin groestlcoin
 
+COPY sources.list /etc/apt/
 RUN set -ex \
-	&& apt-get update \
-	&& apt-get install -qq --no-install-recommends ca-certificates dirmngr gosu wget \
+	&& apt update \
+	&& apt install -y -qq --no-install-recommends ca-certificates dirmngr gosu wget \
 	&& rm -rf /var/lib/apt/lists/*
 
 ENV GROESTLCOIN_VERSION 23.0
@@ -38,3 +39,4 @@ ENTRYPOINT ["/entrypoint.sh"]
 
 EXPOSE 1331 1441 17777 17766 18888 18443
 CMD ["groestlcoind"]
+docker run -d --rm --name groestlcoind groestlcoin-cli 
